@@ -1,0 +1,1394 @@
+/*
+ * Nocturne Library — time_tavern 前端主題
+ * 版本：0.2.0
+ * 測試對象：time_tavern 2026-09-18 版（styles.css?v=20260918-novelai-cleanup）
+ *
+ * 載入方式：index.html 在 styles.css 之後加一行
+ *   <link id="nocturne-library-theme" rel="stylesheet" href="/themes/nocturne-library/nocturne.css?v=0.2.0" />
+ * 移除方式：刪掉那一行。
+ *
+ * 寫法說明：
+ * - 只覆寫外觀，不改任何 id、事件或 DOM。
+ * - 選擇器與原本 styles.css 同等級，靠「後載入」勝出。
+ *   所以凡是原本手機版（980px / 640px）也有設定的屬性，下面的響應式區塊都要再寫一次。
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap");
+
+/* ───────────────────────── 1. 變數 ───────────────────────── */
+
+:root {
+  --nl-bg: #171311;
+  --nl-bg-2: #211916;
+  --nl-panel: #30231f;
+  --nl-field: #2b201d;
+  --nl-deep: #120e0c;
+  --nl-text: #e9e0d3;
+  --nl-text-2: #bca38a;
+  --nl-text-3: #8f7a66;
+  --nl-narration: #d2c4b1;
+  --nl-dialogue: #f7efe3;
+  --nl-accent: #d7b98e;
+  --nl-accent-hover: #e6cba3;
+  --nl-accent-ink: #1d1512;
+  --nl-accent-soft: rgba(215, 185, 142, 0.1);
+  --nl-line: #59443a;
+  --nl-line-soft: rgba(89, 68, 58, 0.55);
+  --nl-danger: #d98a76;
+  --nl-danger-soft: rgba(217, 138, 118, 0.1);
+  --nl-ok: #a3b883;
+  --nl-warn: #ddb874;
+
+  --nl-serif: "Noto Serif TC", "Noto Serif SC", "Source Han Serif TC", "Source Han Serif", "Songti TC", "Songti SC", "PMingLiU", "SimSun", serif;
+  --nl-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+
+  --nl-read-size: 18px;
+  --nl-read-leading: 1.9;
+  --nl-read-width: 820px;
+  --nl-topbar: 56px;
+  --nl-radius: 8px;
+
+  /* 原本的變數也一起換成主題色，沒被逐一覆寫的地方至少會跟著變 */
+  --bg: var(--nl-bg);
+  --bg-soft: var(--nl-bg-2);
+  --panel: var(--nl-bg-2);
+  --panel-border: var(--nl-line);
+  --text: var(--nl-text);
+  --muted: var(--nl-text-2);
+  --accent: var(--nl-accent);
+  --accent-2: var(--nl-accent);
+  --danger: var(--nl-danger);
+  --ok: var(--nl-ok);
+  --cursor: auto;
+  --cursor-pointer: pointer;
+
+  color-scheme: dark;
+}
+
+/* ───────────────────────── 2. 頁面底色與特效 ───────────────────────── */
+
+body {
+  font-size: 16px;
+  background: var(--nl-bg);
+  color: var(--nl-text);
+}
+
+body::before {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(215, 185, 142, 0.06), transparent 60%),
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.35));
+}
+
+body.has-custom-background::before {
+  background:
+    linear-gradient(180deg, rgba(23, 19, 17, 0.84), rgba(23, 19, 17, 0.93)),
+    var(--web-background-image);
+  background-position: center, center;
+  background-size: auto, cover;
+  background-repeat: no-repeat;
+}
+
+/* 粒子、火花、滑鼠跟隨圖、點擊波紋：低干擾主題一律不顯示 */
+#background-canvas,
+#spark-canvas,
+#mouse-follower,
+.click-ripple {
+  display: none;
+}
+
+/* 可讀的焦點框 */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--nl-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgba(215, 185, 142, 0.32);
+  color: #fff8ee;
+}
+
+/* ───────────────────────── 3. 版面 ───────────────────────── */
+
+.layout {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  grid-template-columns: 330px minmax(0, 1fr);
+  grid-template-rows: var(--nl-topbar) auto;
+}
+
+/* 頂部列：原本的大標題區塊縮成一條 */
+.hero {
+  height: var(--nl-topbar);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px solid var(--nl-line);
+  border-radius: 0;
+  background: var(--nl-bg-2);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.hero h1 {
+  font-family: var(--nl-serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--nl-accent);
+  text-shadow: none;
+  animation: none;
+  white-space: nowrap;
+}
+
+.hero p {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--nl-text-3);
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.status-pill {
+  flex: 0 0 auto;
+  padding: 3px 12px;
+  border: 1px solid var(--nl-line);
+  background: transparent;
+  color: var(--nl-text-2);
+  font-size: 13px;
+}
+
+.status-pill.started {
+  border-color: rgba(163, 184, 131, 0.55);
+  background: rgba(163, 184, 131, 0.08);
+  color: var(--nl-ok);
+}
+
+.panel {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* 左側欄：獨立捲動，聊天區捲動時不跟著跑 */
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  max-height: calc(100dvh - var(--nl-topbar));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px 20px 28px;
+  border-right: 1px solid var(--nl-line);
+  background: var(--nl-bg-2);
+  scrollbar-width: thin;
+  scrollbar-color: var(--nl-line) transparent;
+}
+
+.sidebar h2,
+html[lang] .sidebar h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--nl-line-soft);
+  font-family: var(--nl-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--nl-text-2);
+}
+
+.actions-block {
+  margin-top: 22px;
+  gap: 8px;
+}
+
+.chat-panel {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* 閱讀區剛好一個畫面高，輸入框固定在底部 */
+.chat-primary {
+  height: calc(100dvh - var(--nl-topbar));
+}
+
+.chat-secondary {
+  padding: 0 24px 24px;
+}
+
+/* ───────────────────────── 4. 字型與表單 ───────────────────────── */
+
+html[lang] .hero h1,
+html[lang] .markdown-body h1,
+html[lang] .markdown-body h2,
+html[lang] .markdown-body h3,
+html[lang] .markdown-body h4,
+html[lang] .markdown-body h5,
+html[lang] .markdown-body h6,
+html[lang] .role-card h3,
+html[lang] .role-picker-cover,
+html[lang] .role-picker-card h4,
+html[lang] button.desktop-role-picker-btn {
+  font-family: var(--nl-serif);
+}
+
+label {
+  font-size: 15px;
+  color: var(--nl-text-2);
+}
+
+.form-hint {
+  font-size: 14px;
+  color: var(--nl-text-3);
+}
+
+input,
+textarea,
+select,
+button {
+  border: 1px solid var(--nl-line);
+  border-radius: var(--nl-radius);
+  font-size: 16px;
+  color: var(--nl-text);
+  background: var(--nl-field);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--nl-accent);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--nl-text-3);
+}
+
+/* 按鈕：原本 粉紅＝主要、藍＝次要、灰＝最弱，改成 金框／深底／透明 */
+button {
+  background: transparent;
+  border: 1px solid var(--nl-accent);
+  color: var(--nl-accent);
+  font-weight: 600;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+button:hover {
+  transform: none;
+  filter: none;
+  background: var(--nl-accent-soft);
+  color: var(--nl-accent-hover);
+}
+
+button.secondary {
+  background: var(--nl-panel);
+  border-color: var(--nl-line);
+  color: var(--nl-text);
+}
+
+button.secondary:hover {
+  border-color: var(--nl-accent);
+  background: #3a2b26;
+  color: var(--nl-text);
+}
+
+button.muted {
+  background: transparent;
+  border-color: var(--nl-line-soft);
+  color: var(--nl-text-2);
+}
+
+button.muted:hover {
+  border-color: var(--nl-line);
+  background: rgba(255, 240, 220, 0.04);
+  color: var(--nl-text);
+}
+
+button:disabled,
+button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.button-link,
+.button-link.secondary {
+  border: 1px solid var(--nl-line);
+  border-radius: var(--nl-radius);
+  background: var(--nl-panel);
+  color: var(--nl-text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.button-link:hover {
+  border-color: var(--nl-accent);
+}
+
+/* 送出、對話框的「保存」：金底實心，畫面上最醒目的按鈕 */
+#sendBtn,
+.dialog-actions button[type="submit"] {
+  background: var(--nl-accent);
+  border-color: var(--nl-accent);
+  color: var(--nl-accent-ink);
+}
+
+#sendBtn:hover,
+.dialog-actions button[type="submit"]:hover {
+  background: var(--nl-accent-hover);
+  color: var(--nl-accent-ink);
+}
+
+/* 原本的彩虹霓虹「選擇」鈕 */
+button.desktop-role-picker-btn {
+  min-height: 52px;
+  border: 1px solid var(--nl-accent);
+  border-radius: var(--nl-radius);
+  background: linear-gradient(180deg, #3a2b24, var(--nl-field));
+  color: var(--nl-accent);
+  font-size: 20px;
+  letter-spacing: 0.3em;
+  box-shadow: none;
+  animation: none;
+}
+
+button.desktop-role-picker-btn:hover,
+button.desktop-role-picker-btn:active,
+button.desktop-role-picker-btn:focus-visible {
+  transform: none;
+  border-color: var(--nl-accent-hover);
+  color: var(--nl-accent-hover);
+  filter: none;
+  box-shadow: none;
+  background: linear-gradient(180deg, #43322a, #30231f);
+}
+
+button.desktop-role-picker-btn:focus-visible {
+  outline: 2px solid var(--nl-accent);
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--nl-accent);
+}
+
+/* ───────────────────────── 5. 聊天標頭（角色資訊） ───────────────────────── */
+
+.discord-chat-header {
+  min-height: 68px;
+  padding: 10px 28px;
+  border-bottom: 1px solid var(--nl-line-soft);
+  background: rgba(23, 19, 17, 0.92);
+}
+
+.chat-header-avatar .discord-avatar {
+  box-shadow: 0 0 0 1px var(--nl-line), 0 0 0 3px var(--nl-bg), 0 0 0 4px rgba(215, 185, 142, 0.35);
+}
+
+.chat-header-text h2 {
+  font-family: var(--nl-serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--nl-text);
+}
+
+.chat-header-text p {
+  color: var(--nl-text-2);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.conversation-context-picker select {
+  border-color: var(--nl-line);
+  border-radius: 6px;
+  background-color: var(--nl-field);
+  color: var(--nl-text);
+}
+
+.conversation-context-picker select:focus-visible {
+  outline: 2px solid var(--nl-accent);
+}
+
+.icon-button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--nl-text-2);
+}
+
+.icon-button:hover {
+  border-color: var(--nl-line);
+  background: var(--nl-panel);
+  color: var(--nl-accent);
+}
+
+.context-delete-button {
+  border-color: transparent;
+  color: var(--nl-text-3);
+}
+
+.context-delete-button:hover:not(:disabled) {
+  border-color: var(--nl-danger);
+  background: var(--nl-danger-soft);
+  color: var(--nl-danger);
+}
+
+.discord-avatar {
+  background: linear-gradient(145deg, #4a372e, #2b201d);
+  color: var(--nl-accent);
+  font-family: var(--nl-serif);
+}
+
+/* ───────────────────────── 6. 小說式閱讀區 ───────────────────────── */
+
+.messages {
+  padding: 36px 28px 48px;
+  background: transparent;
+  scrollbar-width: thin;
+  scrollbar-color: var(--nl-line) transparent;
+}
+
+.discord-empty {
+  max-width: var(--nl-read-width);
+  margin: 48px auto;
+  font-family: var(--nl-serif);
+  color: var(--nl-text-3);
+  font-size: 17px;
+  text-align: center;
+}
+
+.discord-date-divider {
+  max-width: var(--nl-read-width);
+  margin: 8px auto 28px;
+  font-family: var(--nl-serif);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--nl-text-3);
+}
+
+.discord-date-divider::before,
+.discord-date-divider::after {
+  background: var(--nl-line-soft);
+}
+
+/* 每則訊息：置中閱讀欄，不要頭像，不要泡泡 */
+.discord-message {
+  max-width: var(--nl-read-width);
+  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 14px 0 26px;
+}
+
+.discord-message > .discord-avatar {
+  display: none;
+}
+
+.discord-message:hover {
+  background: transparent;
+}
+
+.discord-message + .discord-message.assistant,
+.discord-message.assistant + .discord-message {
+  border-top: 1px solid rgba(89, 68, 58, 0.28);
+}
+
+.discord-message-header {
+  min-height: 0;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.discord-message-author {
+  font-family: var(--nl-serif);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--nl-accent);
+}
+
+.discord-message.user .discord-message-author {
+  font-family: var(--nl-sans);
+  font-weight: 600;
+  color: var(--nl-text-2);
+}
+
+.discord-message-badge {
+  border: 1px solid var(--nl-line);
+  background: transparent;
+  color: var(--nl-text-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.discord-message-time,
+.discord-message-edited {
+  color: var(--nl-text-3);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.discord-message-invalid-badge {
+  border-color: var(--nl-danger);
+  background: var(--nl-danger-soft);
+  color: var(--nl-danger);
+  font-size: 12px;
+}
+
+.discord-message.invalid-conversation {
+  border-left: 0;
+  background: transparent;
+}
+
+.discord-message.invalid-conversation .discord-message-body {
+  padding-left: 16px;
+  border-left: 2px dashed var(--nl-danger);
+}
+
+/* 正文 */
+.message-content {
+  font-family: var(--nl-serif);
+  font-size: var(--nl-read-size);
+  line-height: var(--nl-read-leading);
+  letter-spacing: 0.02em;
+  color: var(--nl-text);
+}
+
+.discord-message.assistant .markdown-body > p {
+  margin: 0 0 1.05em;
+  text-indent: 2em;
+}
+
+.discord-message.assistant .markdown-body > p:last-child {
+  margin-bottom: 0;
+}
+
+/* 使用者訊息：左側金線＋黑體＋略小，不只靠顏色辨識 */
+.discord-message.user .discord-message-body {
+  padding: 2px 0 2px 18px;
+  border-left: 2px solid var(--nl-accent);
+}
+
+.discord-message.user .message-content {
+  font-family: var(--nl-sans);
+  font-size: calc(var(--nl-read-size) - 1px);
+  line-height: 1.75;
+  color: #dccfbd;
+}
+
+.discord-message-content.streaming-reasoning .markdown-body {
+  color: var(--nl-text-3);
+}
+
+/* 系統提示 */
+.compression-notice {
+  border: 1px solid var(--nl-line);
+  border-radius: 6px;
+  background: var(--nl-accent-soft);
+  color: var(--nl-accent);
+  font-family: var(--nl-sans);
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.auto-time-warning-notice {
+  border: 1px solid rgba(221, 184, 116, 0.45);
+  border-radius: 6px;
+  background: rgba(221, 184, 116, 0.07);
+  color: var(--nl-warn);
+  font-family: var(--nl-sans);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Markdown */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin: 1.1em 0 0.5em;
+  font-family: var(--nl-serif);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--nl-accent);
+  text-shadow: none;
+  text-indent: 0;
+}
+
+.markdown-body blockquote,
+.message-reasoning-content blockquote {
+  border-left: 2px solid var(--nl-accent);
+  border-radius: 0;
+  background: rgba(215, 185, 142, 0.05);
+  color: var(--nl-text);
+}
+
+.markdown-body code,
+.message-reasoning-content code {
+  background: var(--nl-deep);
+  color: #e3c9a0;
+}
+
+.markdown-body pre,
+.message-reasoning-content pre {
+  border-color: var(--nl-line);
+  border-radius: 6px;
+  background: var(--nl-deep);
+  line-height: 1.55;
+}
+
+.markdown-body a,
+.message-reasoning-content a {
+  color: var(--nl-accent);
+}
+
+.markdown-body img {
+  border-radius: 6px;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border-color: var(--nl-line);
+}
+
+.markdown-body th {
+  background: var(--nl-panel);
+  color: var(--nl-accent);
+}
+
+.markdown-body hr {
+  margin: 1.6em auto;
+  width: 40%;
+  border-top-color: var(--nl-line);
+}
+
+.markdown-body details {
+  border-color: var(--nl-line);
+  background: rgba(255, 240, 220, 0.02);
+}
+
+.message-reasoning {
+  border-color: var(--nl-line);
+  background: rgba(255, 240, 220, 0.02);
+}
+
+.message-reasoning summary {
+  color: var(--nl-text-2);
+}
+
+.message-reasoning-content {
+  color: var(--nl-text-2);
+}
+
+/* 圖片 */
+.message-image-link {
+  border-color: var(--nl-line);
+  border-radius: 6px;
+  background: var(--nl-deep);
+}
+
+/* ───────────────────────── 7. 訊息操作 ───────────────────────── */
+
+.message-feedback-actions {
+  min-height: 30px;
+  margin-top: 12px;
+}
+
+.message-feedback-button {
+  width: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  border-color: var(--nl-line-soft);
+  background: transparent;
+  font-size: 15px;
+}
+
+.message-feedback-button:hover,
+.message-feedback-button.active {
+  border-color: var(--nl-accent);
+  background: var(--nl-accent-soft);
+}
+
+.message-feedback-state {
+  color: var(--nl-text-2);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.discord-message:focus-within .discord-message-menu {
+  opacity: 1;
+}
+
+.discord-message-menu > summary {
+  width: 34px;
+  height: 30px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--nl-text-2);
+  font-size: 20px;
+}
+
+.discord-message-menu > summary:hover,
+.discord-message-menu[open] > summary {
+  border-color: var(--nl-line);
+  background: var(--nl-panel);
+  color: var(--nl-accent);
+}
+
+.discord-message-menu-list {
+  top: 36px;
+  border-color: var(--nl-line);
+  border-radius: var(--nl-radius);
+  background: var(--nl-panel);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}
+
+.discord-message-menu-list button {
+  border: 0;
+  background: transparent;
+  color: var(--nl-text);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.discord-message-menu-list button:hover {
+  background: rgba(255, 240, 220, 0.06);
+  color: var(--nl-accent);
+}
+
+/* 桌機（有滑鼠）：讚／倒讚平常淡出，滑過、聚焦或已標記才出現 */
+@media (hover: hover) and (pointer: fine) {
+  .message-feedback-actions {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .discord-message:hover .message-feedback-actions,
+  .discord-message:focus-within .message-feedback-actions,
+  .message-feedback-actions:has(.active) {
+    opacity: 1;
+  }
+}
+
+/* 觸控裝置：⋯ 選單常駐，不靠滑過才看得到 */
+@media (hover: none) {
+  .discord-message-menu {
+    opacity: 0.75;
+  }
+}
+
+/* ───────────────────────── 8. 輸入區 ───────────────────────── */
+
+.chat-input {
+  justify-self: center;
+  width: min(calc(100% - 40px), calc(var(--nl-read-width) + 48px));
+  margin: 0 0 20px;
+  padding: 10px 12px;
+  border: 1px solid var(--nl-line);
+  border-radius: 12px;
+  background: var(--nl-field);
+  box-shadow: 0 -12px 30px rgba(23, 19, 17, 0.9);
+  transition: border-color 0.12s ease;
+}
+
+.chat-input:focus-within {
+  border-color: rgba(215, 185, 142, 0.7);
+}
+
+.chat-input textarea {
+  border: 0;
+  background: transparent;
+  color: var(--nl-text);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.chat-input textarea:focus-visible {
+  outline: 0;
+}
+
+.chat-plus-button,
+.chat-input .chat-image-button {
+  border: 1px solid var(--nl-line);
+  background: var(--nl-panel);
+  color: var(--nl-text-2);
+}
+
+.chat-plus-button {
+  font-size: 26px;
+}
+
+.chat-input .chat-image-button {
+  font-size: 20px;
+}
+
+.chat-plus-button:hover,
+.chat-plus-button[aria-expanded="true"],
+.chat-input .chat-image-button:hover {
+  border-color: var(--nl-accent);
+  background: #3a2b26;
+  color: var(--nl-accent);
+}
+
+.chat-input .chat-image-remove-button {
+  border: 0;
+  background: rgba(18, 14, 12, 0.88);
+  color: var(--nl-text);
+}
+
+.chat-image-preview-item img {
+  border-color: var(--nl-line);
+}
+
+/* ＋ 指令選單 */
+.chat-command-menu {
+  border-color: var(--nl-line);
+  border-radius: 12px;
+  background: var(--nl-bg-2);
+  box-shadow: 0 -14px 36px rgba(0, 0, 0, 0.45);
+}
+
+.chat-command-item {
+  border: 1px solid transparent;
+  color: var(--nl-text);
+}
+
+.chat-command-item:hover,
+.chat-command-item.active {
+  border-color: var(--nl-line);
+  background: var(--nl-panel);
+}
+
+.chat-command-icon {
+  background: var(--nl-field);
+  color: var(--nl-accent);
+  font-size: 24px;
+}
+
+.chat-command-title,
+.chat-command-name,
+.chat-command-title-text {
+  color: var(--nl-text);
+}
+
+.chat-command-description,
+.chat-command-field-help-text {
+  color: var(--nl-text-2);
+}
+
+.chat-command-empty {
+  color: var(--nl-text-3);
+}
+
+.chat-command-form-header {
+  border-color: var(--nl-line);
+  background: var(--nl-panel);
+}
+
+.chat-command-field-help {
+  color: var(--nl-text-2);
+}
+
+.chat-command-field-help.active {
+  background: var(--nl-accent-soft);
+  color: var(--nl-text);
+}
+
+.chat-command-composer-command {
+  background: var(--nl-panel);
+  color: var(--nl-accent);
+}
+
+.chat-command-param {
+  border-color: var(--nl-line);
+  background: var(--nl-bg-2);
+}
+
+.chat-command-param.active {
+  border-color: var(--nl-accent);
+  box-shadow: none;
+}
+
+.chat-command-param-label {
+  color: var(--nl-text-2);
+}
+
+.chat-command-param-input {
+  border: 0;
+  background: transparent;
+  color: var(--nl-text);
+}
+
+.chat-command-param-input::placeholder {
+  color: var(--nl-text-3);
+}
+
+/* ───────────────────────── 9. 側欄卡片、AI 紀錄 ───────────────────────── */
+
+.role-card,
+.custom-section-card,
+.cover-preview {
+  border-color: var(--nl-line);
+  background: rgba(255, 240, 220, 0.025);
+}
+
+.meta-box {
+  border-color: var(--nl-line);
+  border-radius: var(--nl-radius);
+  background: rgba(255, 240, 220, 0.02);
+}
+
+.meta-box summary {
+  color: var(--nl-text-2);
+  font-weight: 600;
+}
+
+.ai-log-item {
+  border-color: var(--nl-line-soft);
+  border-radius: var(--nl-radius);
+  background: rgba(255, 240, 220, 0.02);
+}
+
+.ai-log-title {
+  color: var(--nl-text);
+  font-size: 15px;
+}
+
+.ai-log-usage,
+.ai-log-status {
+  color: var(--nl-text-2);
+  font-size: 14px;
+}
+
+.ai-log-status.error {
+  color: var(--nl-danger);
+}
+
+.ai-log-status.skipped {
+  color: var(--nl-warn);
+}
+
+.ai-log-cost-total {
+  border-color: var(--nl-line);
+  background: var(--nl-accent-soft);
+  color: var(--nl-accent);
+  font-size: 15px;
+}
+
+.ai-log-block,
+.ai-log-block.reasoning,
+.ai-log-block.cost {
+  border-color: var(--nl-line);
+  background: var(--nl-deep);
+  color: var(--nl-text);
+  font-size: 14px;
+}
+
+/* ───────────────────────── 10. 對話框 ───────────────────────── */
+
+.dialog {
+  border-color: var(--nl-line);
+  background: var(--nl-bg-2);
+  color: var(--nl-text);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+  scrollbar-width: thin;
+  scrollbar-color: var(--nl-line) transparent;
+}
+
+.dialog::backdrop {
+  background: rgba(10, 8, 7, 0.74);
+}
+
+.dialog h3 {
+  font-family: var(--nl-serif);
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  color: var(--nl-accent);
+}
+
+.dialog h4 {
+  color: var(--nl-text);
+}
+
+.update-notes-dialog {
+  border-color: var(--nl-line);
+  background: var(--nl-bg-2);
+}
+
+.update-notes-layout {
+  border-top-color: var(--nl-line);
+}
+
+.update-notes-list {
+  border-right-color: var(--nl-line);
+  background: var(--nl-bg);
+}
+
+.update-note-item {
+  border-color: transparent;
+  background: transparent;
+  color: var(--nl-text);
+}
+
+.update-note-item:hover {
+  background: rgba(255, 240, 220, 0.04);
+}
+
+.update-note-item[aria-pressed="true"] {
+  border-left-color: var(--nl-accent);
+  background: var(--nl-accent-soft);
+  color: var(--nl-accent);
+}
+
+.update-notes-content h4 {
+  font-family: var(--nl-serif);
+  color: var(--nl-accent);
+}
+
+.opening-dialogue-tab {
+  border-color: var(--nl-line);
+  background: var(--nl-field);
+  color: var(--nl-text-2);
+}
+
+.opening-dialogue-tab.active {
+  border-color: var(--nl-accent);
+  background: var(--nl-accent-soft);
+  color: var(--nl-accent);
+}
+
+/* 選擇角色卡 */
+.role-picker-card {
+  border-color: var(--nl-line);
+  border-radius: 10px;
+  background: var(--nl-field);
+  box-shadow: none;
+}
+
+.role-picker-card.active {
+  border-color: var(--nl-accent);
+  box-shadow: 0 0 0 1px var(--nl-accent);
+}
+
+.role-picker-cover {
+  border-radius: 6px;
+  background: var(--nl-deep);
+  color: var(--nl-accent);
+  text-shadow: none;
+}
+
+.role-picker-card h4 {
+  font-size: 19px;
+  letter-spacing: 0.04em;
+  color: var(--nl-text);
+}
+
+.role-picker-intro,
+.role-picker-content {
+  color: var(--nl-text-2);
+  font-size: 15px;
+}
+
+/* 對話存檔（書架） */
+.session-shelf {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.session-book {
+  border-color: rgba(255, 240, 220, 0.18);
+  color: #f6ecdc;
+}
+
+.session-book-tone-0 { background: #5b3a2e; }
+.session-book-tone-1 { background: #3e4a39; }
+.session-book-tone-2 { background: #4b2f36; }
+.session-book-tone-3 { background: #2f3d4a; }
+.session-book-tone-4 { background: #6a5233; }
+.session-book-tone-5 { background: #43352d; }
+
+.session-book.previewing,
+.session-book:focus-visible {
+  outline: 2px solid var(--nl-accent);
+}
+
+.session-preview-panel {
+  border-color: var(--nl-line);
+  background: var(--nl-bg);
+}
+
+.session-preview-message.user {
+  border-color: var(--nl-line);
+}
+
+.session-preview-message.assistant {
+  border-color: rgba(215, 185, 142, 0.4);
+}
+
+.session-preview-message-body {
+  font-family: var(--nl-serif);
+  line-height: 1.8;
+}
+
+/* ───────────────────────── 11. 閱讀層次（Phase 2，需要 nocturne.js） ───────────────────────── */
+
+/*
+ * nocturne.js 載入後會在 <html> 加上 nl-js，並把對白包成 .nl-dialogue。
+ * 沒有 JS 時這一段不生效，正文維持單一顏色。
+ * 只改顏色，不改字重或字級，避免生成中的訊息高度跳動。
+ */
+html.nl-js .discord-message.assistant .discord-message-content > .markdown-body,
+html.nl-js .session-preview-message.assistant .session-preview-message-body {
+  color: var(--nl-narration);
+}
+
+.nl-dialogue {
+  color: var(--nl-dialogue);
+}
+
+.nl-quote-mark {
+  color: var(--nl-accent);
+}
+
+/* 頂部列的側欄收合鈕（只在桌機出現） */
+.nl-sidebar-toggle {
+  flex: 0 0 auto;
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--nl-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--nl-text-2);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.nl-sidebar-toggle:hover {
+  border-color: var(--nl-accent);
+  background: var(--nl-accent-soft);
+  color: var(--nl-accent);
+}
+
+@media (min-width: 981px) {
+  html.nl-sidebar-collapsed .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.nl-sidebar-collapsed .layout > .sidebar {
+    display: none;
+  }
+}
+
+/* 長篇正文：兩端對齊，邊緣整齊像書頁 */
+.discord-message.assistant .markdown-body > p,
+.discord-message.assistant .markdown-body > blockquote > p {
+  text-align: justify;
+}
+
+/* 插圖：在閱讀欄內置中；只有一張時放大 */
+.discord-message .message-image-grid {
+  justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 360px));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.discord-message .message-image-link {
+  max-width: 360px;
+}
+
+.discord-message .message-image-grid:has(> .message-image-link:only-child) {
+  grid-template-columns: minmax(0, 560px);
+}
+
+.discord-message .message-image-link:only-child {
+  max-width: 560px;
+}
+
+.discord-message .markdown-body img {
+  margin: 1.2em auto;
+}
+
+/* ───────────────────────── 12. Toast ───────────────────────── */
+
+.toast {
+  border: 1px solid var(--nl-line);
+  background: var(--nl-panel);
+  color: var(--nl-text);
+}
+
+/* ───────────────────────── 13. 響應式 ───────────────────────── */
+
+/* 平板與手機（原本的手機版從 980px 開始） */
+@media (max-width: 980px) {
+  :root {
+    --nl-read-size: 17px;
+  }
+
+  .layout {
+    width: 100vw;
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .hero,
+  .mobile-info-drawer .hero {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 58px 16px 12px;
+    background: var(--nl-bg-2);
+    border-bottom: 0;
+    box-shadow: none;
+  }
+
+  .mobile-nav {
+    background: var(--nl-bg-2);
+    border-bottom: 1px solid var(--nl-line);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  /* 手機有自己的 ☰ 抽屜與「功能」頁，不需要收合鈕 */
+  .nl-sidebar-toggle {
+    display: none;
+  }
+
+  .mobile-nav button[aria-pressed="true"] {
+    border-color: var(--nl-accent);
+    background: var(--nl-accent-soft);
+    color: var(--nl-accent);
+  }
+
+  .mobile-info-toggle {
+    border-color: var(--nl-line);
+    background: var(--nl-bg-2);
+    color: var(--nl-accent);
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    border-right: 0;
+    padding: 16px 0 20px;
+    background: transparent;
+  }
+
+  .chat-primary {
+    height: var(--app-mobile-viewport-height, 100dvh);
+  }
+
+  .chat-secondary {
+    padding: 16px 0 20px;
+  }
+
+  .discord-chat-header {
+    padding-left: 64px;
+  }
+
+  .messages {
+    padding: 24px 20px 36px;
+  }
+}
+
+/* 手機 */
+@media (max-width: 640px) {
+  :root {
+    --nl-read-size: 17px;
+    --nl-read-leading: 1.85;
+  }
+
+  body {
+    background: var(--nl-bg);
+  }
+
+  .discord-chat-header {
+    padding: 8px 8px 8px 56px;
+  }
+
+  .chat-header-text h2 {
+    font-size: 17px;
+  }
+
+  .chat-header-text p {
+    font-size: 12px;
+  }
+
+  /* 最後一段要留出輸入框的高度 */
+  .messages {
+    padding: 16px 18px calc(var(--chat-input-height, 76px) + env(safe-area-inset-bottom, 0px) + 20px);
+    background: transparent;
+  }
+
+  .discord-message {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px 0 20px;
+  }
+
+  .message.user,
+  .message.assistant {
+    background: none;
+  }
+
+  .discord-message.user .discord-message-body {
+    padding-left: 14px;
+  }
+
+  .chat-input {
+    width: 100%;
+    margin: 0;
+    padding: 7px 8px calc(env(safe-area-inset-bottom, 0px) + 7px);
+    border: 0;
+    border-top: 1px solid var(--nl-line);
+    border-radius: 0;
+    background: var(--nl-bg-2);
+    box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.4);
+  }
+
+  .chat-input textarea {
+    border: 1px solid var(--nl-line);
+    border-radius: var(--nl-radius);
+    background: var(--nl-field);
+    font-size: 16px;
+  }
+
+  .chat-input textarea:focus {
+    border-color: var(--nl-accent);
+    box-shadow: none;
+  }
+}
+
+/* ───────────────────────── 14. 減少動態 ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
